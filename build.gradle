@@ -1,0 +1,45 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        maven {
+            url 'https://oss.sonatype.org/service/local/repositories/releases/content'
+        }
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath("com.xebialabs.gradle.plugins:integration-server-gradle-plugin:10.4.0-1019.1102")
+    }
+}
+
+plugins {
+    id 'scala'
+    id 'idea'
+}
+
+repositories {
+    mavenCentral()
+}
+
+apply plugin: "integration.server"
+
+releaseIntegrationServer {
+    servers {
+        controlPlane {
+            dockerImage = "xebialabs/xl-release"
+            version = "10.2.2"
+            httpPort = 3333
+        }
+    }
+}
+
+rootProject.afterEvaluate {
+    startIntegrationServer.dependsOn(build)
+}
+
+idea {
+    module {
+        excludeDirs += file('build')
+    }
+}
